@@ -1,0 +1,54 @@
+import os
+import sys
+
+from flask import Blueprint, jsonify, request
+
+from models import Projeto
+from models.models import db
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
+projetos = Blueprint('projetos', __name__)
+
+
+@projetos.route('/projetos', methods=['POST'])
+def create_projeto():
+    data = request.get_json()
+    new_projeto = Projeto(nome=data['nome'], descricao=data['descricao'], cliente_id=data['cliente_id'],
+                          status_projeto_id=data['status_projeto_id'])
+    db.session.add(new_projeto)
+    db.session.commit()
+    return jsonify({"id": new_projeto.id, "nome": new_projeto.nome, "descricao": new_projeto.descricao,
+                    "cliente_id": new_projeto.cliente_id, "status_projeto_id": new_projeto.status_projeto_id}), 201
+
+
+@projetos.route('/projetos', methods=['GET'])
+def get_projetos():
+    projetos = Projeto.query.all()
+    return jsonify([{"id": projeto.id, "nome": projeto.nome, "descricao": projeto.descricao,
+                     "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id}
+                    for projeto in projetos])
+
+
+@projetos.route('/projetos/<int:projeto_id>', methods=['PUT'])
+def update_projeto(projeto_id):
+    projeto = Projeto.query.get(projeto_id)
+    if projeto:
+        data = request.get_json()
+        projeto.nome = data['nome']
+        projeto.descricao = data['descricao']
+        projeto.cliente_id = data['cliente_id']
+        projeto.status_projeto_id = data['status_projeto_id']
+        db.session.commit()
+        return jsonify({"id": projeto.id, "nome": projeto.nome, "descricao": projeto.descricao,
+                        "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id})
+    return jsonify({"message": "Projeto não encontrado"}), 404
+
+
+@projetos.route('/projetos/<int:projeto_id>', methods=['DELETE'])
+def delete_projeto(projeto_id):
+    projeto = Projeto.query.get(projeto_id)
+    if projeto:
+        db.session.delete(projeto)
+        db.session.commit()
+        return jsonify({"message": "Projeto excluído com sucesso"})
+    return jsonify({"message": "Projeto não encontrado"}), 404
