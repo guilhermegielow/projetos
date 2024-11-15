@@ -23,7 +23,7 @@ def create_projeto():
         db.session.commit()
         return jsonify({"id": new_projeto.id, "nome": new_projeto.nome, "descricao": new_projeto.descricao,
                         "cliente_id": new_projeto.cliente_id, "status_projeto_id": new_projeto.status_projeto_id}), 201
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
 
 
@@ -37,7 +37,7 @@ def get_projetos():
                          "cliente_id": projeto.cliente_id, 'cliente_nome': projeto.cliente.nome,
                          "status_projeto_id": projeto.status_projeto_id, 'status_projeto_nome': projeto.status_projeto.nome}
                         for projeto in projetos_list])
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
 
 
@@ -61,7 +61,7 @@ def get_projetos_abertos():
             projetos_list.append(projeto_info)
 
         return jsonify(projetos_list)
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
 
 
@@ -79,7 +79,7 @@ def update_projeto(projeto_id):
             return jsonify({"id": projeto.id, "nome": projeto.nome, "descricao": projeto.descricao,
                             "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id})
         return jsonify({"message": "Projeto não encontrado"}), 404
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
 
 
@@ -92,5 +92,5 @@ def delete_projeto(projeto_id):
             db.session.commit()
             return jsonify({"message": "Projeto excluído com sucesso"})
         return jsonify({"message": "Projeto não encontrado"}), 404
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))

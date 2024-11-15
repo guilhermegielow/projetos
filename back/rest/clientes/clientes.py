@@ -19,7 +19,7 @@ def create_cliente():
         db.session.commit()
         return jsonify({"id": new_cliente.id, "nome": new_cliente.nome, "email": new_cliente.email,
                         "telefone": new_cliente.telefone, "cnpj": new_cliente.cnpj}), 201
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
 
 
@@ -32,7 +32,7 @@ def get_clientes():
         return jsonify([{"id": cliente.id, "nome": cliente.nome, "email": cliente.email, "telefone": cliente.telefone,
                          "cnpj": cliente.cnpj}
                         for cliente in clientes_list])
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
 
 
@@ -51,7 +51,7 @@ def get_cliente(cliente_id):
             "telefone": cliente.telefone,
             "cnpj": cliente.cnpj
         })
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
 
 
@@ -70,7 +70,7 @@ def update_cliente(cliente_id):
                 {"id": cliente.id, "nome": cliente.nome, "email": cliente.email, "telefone": cliente.telefone,
                  "cnpj": cliente.cnpj})
         return jsonify({"message": "Cliente não encontrado"}), 404
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
 
 
@@ -83,5 +83,5 @@ def delete_cliente(cliente_id):
             db.session.commit()
             return jsonify({"message": "Cliente excluído com sucesso"})
         return jsonify({"message": "Cliente não encontrado"}), 404
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))

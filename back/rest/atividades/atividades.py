@@ -22,7 +22,7 @@ def create_atividade():
         db.session.commit()
         return jsonify({"id": new_atividade.id, "projeto_id": new_atividade.projeto_id,
                         "descricao": new_atividade.descricao, "data": new_atividade.data}), 201
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
 
 
@@ -43,7 +43,7 @@ def get_atividades():
             "descricao": atividade.descricao,
             "data": atividade.data
         } for atividade in atividades_list])
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
 
 
@@ -61,7 +61,7 @@ def get_atividade(atividade_id):
             "data": atividade.data,
             "projeto_id": atividade.projeto_id
         })
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
 
 
@@ -76,7 +76,7 @@ def update_atividade(atividade_id):
             db.session.commit()
             return jsonify({"id": atividade.id, "descricao": atividade.descricao, "projeto_id": atividade.projeto_id})
         return jsonify({"message": "Atividade não encontrada"}), 404
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
 
 
@@ -89,5 +89,5 @@ def delete_atividade(atividade_id):
             db.session.commit()
             return jsonify({"message": "Atividade excluída com sucesso"})
         return jsonify({"message": "Atividade não encontrada"}), 404
-    except Exception as e:
+    except ValueError as e:
         abort(400, description=str(e))
