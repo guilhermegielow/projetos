@@ -1,7 +1,14 @@
+import os
+import sys
+
 from flask import Flask, jsonify, request, abort
-from models import db, Cliente, Projeto, Atividade
+
+from models import Cliente
+from models.models import db, Atividade, Projeto
 from config import Config
 from flask_cors import CORS
+
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 
 def create_app(config_class=Config):
@@ -29,9 +36,9 @@ def create_app(config_class=Config):
                          "cnpj": cliente.cnpj}
                         for cliente in clientes])
 
-    @app.route('/clientes/<int:id>', methods=['GET'])
-    def get_cliente(id):
-        cliente = Cliente.query.get(id)
+    @app.route('/clientes/<int:cliente_id>', methods=['GET'])
+    def get_cliente(cliente_id):
+        cliente = Cliente.query.get(cliente_id)
 
         if not cliente:
             abort(404, description="Cliente não encontrado")
@@ -44,9 +51,9 @@ def create_app(config_class=Config):
             "cnpj": cliente.cnpj
         })
 
-    @app.route('/clientes/<int:id>', methods=['PUT'])
-    def update_cliente(id):
-        cliente = Cliente.query.get(id)
+    @app.route('/clientes/<int:cliente_id>', methods=['PUT'])
+    def update_cliente(cliente_id):
+        cliente = Cliente.query.get(cliente_id)
         if cliente:
             data = request.get_json()
             cliente.nome = data['nome']
@@ -59,9 +66,9 @@ def create_app(config_class=Config):
                  "cnpj": cliente.cnpj})
         return jsonify({"message": "Cliente não encontrado"}), 404
 
-    @app.route('/clientes/<int:id>', methods=['DELETE'])
-    def delete_cliente(id):
-        cliente = Cliente.query.get(id)
+    @app.route('/clientes/<int:cliente_id>', methods=['DELETE'])
+    def delete_cliente(cliente_id):
+        cliente = Cliente.query.get(cliente_id)
         if cliente:
             db.session.delete(cliente)
             db.session.commit()
@@ -85,9 +92,9 @@ def create_app(config_class=Config):
                          "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id}
                         for projeto in projetos])
 
-    @app.route('/projetos/<int:id>', methods=['PUT'])
-    def update_projeto(id):
-        projeto = Projeto.query.get(id)
+    @app.route('/projetos/<int:projeto_id>', methods=['PUT'])
+    def update_projeto(projeto_id):
+        projeto = Projeto.query.get(projeto_id)
         if projeto:
             data = request.get_json()
             projeto.nome = data['nome']
@@ -99,9 +106,9 @@ def create_app(config_class=Config):
                             "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id})
         return jsonify({"message": "Projeto não encontrado"}), 404
 
-    @app.route('/projetos/<int:id>', methods=['DELETE'])
-    def delete_projeto(id):
-        projeto = Projeto.query.get(id)
+    @app.route('/projetos/<int:projeto_id>', methods=['DELETE'])
+    def delete_projeto(projeto_id):
+        projeto = Projeto.query.get(projeto_id)
         if projeto:
             db.session.delete(projeto)
             db.session.commit()
@@ -130,9 +137,9 @@ def create_app(config_class=Config):
             "data": atividade.data
         } for atividade in atividades])
 
-    @app.route('/atividades/<int:id>', methods=['GET'])
-    def get_atividade(id):
-        atividade = Atividade.query.get(id)
+    @app.route('/atividades/<int:atividade_id>', methods=['GET'])
+    def get_atividade(atividade_id):
+        atividade = Atividade.query.get(atividade_id)
 
         if not atividade:
             abort(404, description="Atividade não encontrado")
@@ -144,9 +151,9 @@ def create_app(config_class=Config):
             "projeto_id": atividade.projeto_id
         })
 
-    @app.route('/atividades/<int:id>', methods=['PUT'])
-    def update_atividade(id):
-        atividade = Atividade.query.get(id)
+    @app.route('/atividades/<int:atividade_id>', methods=['PUT'])
+    def update_atividade(atividade_id):
+        atividade = Atividade.query.get(atividade_id)
         if atividade:
             data = request.get_json()
             atividade.descricao = data['descricao']
@@ -155,9 +162,9 @@ def create_app(config_class=Config):
             return jsonify({"id": atividade.id, "descricao": atividade.descricao, "projeto_id": atividade.projeto_id})
         return jsonify({"message": "Atividade não encontrada"}), 404
 
-    @app.route('/atividades/<int:id>', methods=['DELETE'])
-    def delete_atividade(id):
-        atividade = Atividade.query.get(id)
+    @app.route('/atividades/<int:atividade_id>', methods=['DELETE'])
+    def delete_atividade(atividade_id):
+        atividade = Atividade.query.get(atividade_id)
         if atividade:
             db.session.delete(atividade)
             db.session.commit()
