@@ -150,6 +150,7 @@ def test_delete_cliente_404(setup):
 # Teste da criação de um projeto
 def test_create_projeto(setup):
     client = setup
+
     cliente_data = {
         'nome': 'Carlos Souza',
         'email': 'carlos.souza@email.com',
@@ -162,7 +163,7 @@ def test_create_projeto(setup):
     projeto_data = {
         'nome': 'Projeto A',
         'descricao': 'Descrição do Projeto A',
-        'status_id': 1,  # Assumindo que o status 1 já existe
+        'status_projeto_id': 1,  # Assumindo que o status 1 já existe
         'cliente_id': cliente_id
     }
 
@@ -188,7 +189,7 @@ def test_get_projetos(setup):
     client.post('/projetos', json={
         'nome': 'Projeto B',
         'descricao': 'Descrição do Projeto B',
-        'status_id': 2,  # Assumindo que o status 2 já existe
+        'status_projeto_id': 2,  # Assumindo que o status 2 já existe
         'cliente_id': cliente_id
     })
 
@@ -196,6 +197,84 @@ def test_get_projetos(setup):
     assert response.status_code == 200
     json_data = response.get_json()
     assert len(json_data) > 0  # Verifica se há pelo menos um projeto na lista
+
+def test_update_projeto(setup):
+    client = setup
+
+    cliente_data = {
+        'nome': 'Carlos Souza',
+        'email': 'carlos.souza@email.com',
+        'telefone': '555199999',
+        'cnpj': '12345000123456'
+    }
+    cliente_response = client.post('/clientes', json=cliente_data)
+    cliente_id = cliente_response.get_json()['id']
+    projeto_data = {
+        'nome': 'teste',
+        'descricao': 'descricao_teste',
+        'cliente_id': cliente_id,
+        'status_projeto_id': 1
+    }
+
+    response = client.post('/projetos', json=projeto_data)
+    projeto_id = response.get_json()['id']
+
+    updated_data = {
+        'nome': 'nome',
+        'descricao': 'teste',
+        'cliente_id': cliente_id,
+        'status_projeto_id': 2
+    }
+
+    response = client.put(f'/projetos/{projeto_id}', json=updated_data)
+
+    assert response.status_code == 200
+
+    json_data = response.get_json()
+    assert json_data['nome'] == 'nome'
+    assert json_data['descricao'] == 'teste'
+    assert json_data['status_projeto_id'] == 2
+
+def test_update_projeto_404(setup):
+    client = setup
+    updated_data = {
+        'nome': 'nome',
+        'descricao': 'teste',
+        'cliente_id': '222',
+        'status_projeto_id': 2
+    }
+    response = client.put(f'/projetos/{2222222}', json=updated_data)
+
+    assert response.status_code == 404
+
+def test_delete_projeto(setup):
+    client = setup
+    cliente_data = {
+        'nome': 'Carlos Souza',
+        'email': 'carlos.souza@email.com',
+        'telefone': '555199999',
+        'cnpj': '12345000123456'
+    }
+    cliente_response = client.post('/clientes', json=cliente_data)
+    cliente_id = cliente_response.get_json()['id']
+    projeto_data = {
+        'nome': 'teste',
+        'descricao': 'descricao_teste',
+        'cliente_id': cliente_id,
+        'status_projeto_id': 1
+    }
+
+    response = client.post('/projetos', json=projeto_data)
+    projeto_id = response.get_json()['id']
+
+    response = client.delete(f'/projetos/{projeto_id}')
+
+    assert response.status_code == 200
+
+def test_delete_projetos_404(setup):
+    client = setup
+    response = client.delete(f'/projetos/{123123123}')
+    assert response.status_code == 404
 
 
 # Teste para a rota POST /atividades (Criar atividade)

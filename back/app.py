@@ -77,15 +77,19 @@ def create_app(config_class=Config):
     @app.route('/projetos', methods=['POST'])
     def create_projeto():
         data = request.get_json()
-        new_projeto = Projeto(nome=data['nome'])
+        new_projeto = Projeto(nome=data['nome'], descricao=data['descricao'], cliente_id=data['cliente_id'],
+                              status_projeto_id=data['status_projeto_id'])
         db.session.add(new_projeto)
         db.session.commit()
-        return jsonify({"id": new_projeto.id, "nome": new_projeto.nome}), 201
+        return jsonify({"id": new_projeto.id, "nome": new_projeto.nome, "descricao": new_projeto.descricao,
+                        "cliente_id": new_projeto.cliente_id, "status_projeto_id": new_projeto.status_projeto_id}), 201
 
     @app.route('/projetos', methods=['GET'])
     def get_projetos():
         projetos = Projeto.query.all()
-        return jsonify([{"id": projeto.id, "nome": projeto.nome} for projeto in projetos])
+        return jsonify([{"id": projeto.id, "nome": projeto.nome, "descricao": projeto.descricao,
+                        "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id}
+                        for projeto in projetos])
 
     @app.route('/projetos/<int:id>', methods=['PUT'])
     def update_projeto(id):
@@ -93,8 +97,12 @@ def create_app(config_class=Config):
         if projeto:
             data = request.get_json()
             projeto.nome = data['nome']
+            projeto.descricao = data['descricao']
+            projeto.cliente_id = data['cliente_id']
+            projeto.status_projeto_id = data['status_projeto_id']
             db.session.commit()
-            return jsonify({"id": projeto.id, "nome": projeto.nome})
+            return jsonify({"id": projeto.id, "nome": projeto.nome, "descricao": projeto.descricao,
+                        "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id})
         return jsonify({"message": "Projeto não encontrado"}), 404
 
     @app.route('/projetos/<int:id>', methods=['DELETE'])

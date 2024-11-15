@@ -19,6 +19,7 @@ class Projeto(db.Model):
     nome = db.Column(db.String(255), nullable=False)
     descricao = db.Column(db.Text)
     cliente_id = db.Column(db.Integer, db.ForeignKey('clientes.id'), nullable=False)
+    status_projeto_id = db.Column(db.Integer, db.ForeignKey('status_projeto.id'), nullable=False)
     atividades = db.relationship('Atividade', backref='projeto', lazy=True)
 
 
@@ -34,3 +35,4 @@ class StatusProjeto(db.Model):
     __tablename__ = 'status_projeto'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.Text, nullable=False)
+    projetos = db.relationship('Projeto', backref='status_projeto', lazy=True)
