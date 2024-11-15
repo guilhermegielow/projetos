@@ -118,24 +118,40 @@ def create_app(config_class=Config):
     def create_atividade():
         data = request.get_json()
         new_atividade = Atividade(
-            cliente_id=data['clienteId'],
-            projeto_id=data['projetoId'],
+            projeto_id=data['projeto_id'],
             descricao=data['descricao']
         )
         db.session.add(new_atividade)
         db.session.commit()
-        return jsonify({"id": new_atividade.id, "clienteId": new_atividade.cliente_id,
-                        "projetoId": new_atividade.projeto_id, "descricao": new_atividade.descricao}), 201
+        return jsonify({"id": new_atividade.id, "projeto_id": new_atividade.projeto_id,
+                        "descricao": new_atividade.descricao, "data": new_atividade.data }), 201
 
     @app.route('/atividades', methods=['GET'])
     def get_atividades():
         atividades = Atividade.query.all()
         return jsonify([{
             "id": atividade.id,
-            "clienteId": atividade.cliente_id,
-            "projetoId": atividade.projeto_id,
-            "descricao": atividade.descricao
+            "projeto_id": atividade.projeto_id,
+            "descricao": atividade.descricao,
+            "data": atividade.data
         } for atividade in atividades])
+
+    @app.route('/atividades/<int:id>', methods=['GET'])
+    def get_atividade(id):
+        # Consulta o cliente pelo id
+        atividade = Atividade.query.get(id)
+
+        # Verifica se o cliente existe
+        if not atividade:
+            abort(404, description="Atividade não encontrado")
+
+        # Retorna os dados do cliente em formato JSON
+        return jsonify({
+            "id": atividade.id,
+            "descricao": atividade.descricao,
+            "data": atividade.data,
+            "projeto_id": atividade.projeto_id
+        })
 
     @app.route('/atividades/<int:id>', methods=['PUT'])
     def update_atividade(id):
@@ -143,11 +159,9 @@ def create_app(config_class=Config):
         if atividade:
             data = request.get_json()
             atividade.descricao = data['descricao']
-            atividade.cliente_id = data['clienteId']
-            atividade.projeto_id = data['projetoId']
+            atividade.projeto_id = data['projeto_id']
             db.session.commit()
-            return jsonify({"id": atividade.id, "descricao": atividade.descricao,
-                            "clienteId": atividade.cliente_id, "projetoId": atividade.projeto_id})
+            return jsonify({"id": atividade.id, "descricao": atividade.descricao, "projeto_id": atividade.projeto_id})
         return jsonify({"message": "Atividade não encontrada"}), 404
 
     @app.route('/atividades/<int:id>', methods=['DELETE'])

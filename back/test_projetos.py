@@ -317,6 +317,40 @@ def test_create_atividade(setup):
     assert json_data['projeto_id'] == projeto_id
     assert 'data' in json_data  # Verificar se a data foi gerada automaticamente
 
+def test_get_atividade_id(setup):
+    client = setup
+    cliente_data = {
+        'nome': 'Ricardo Martins',
+        'email': 'ricardo.martins@email.com',
+        'telefone': '123456789',
+        'cnpj': '12345678000195'
+    }
+    cliente_response = client.post('/clientes', json=cliente_data)
+    cliente_id = cliente_response.get_json()['id']
+
+    # Criar um projeto antes de criar a atividade
+    projeto_data = {
+        'nome': 'Projeto X',
+        'descricao': 'Projeto de Desenvolvimento de Software',
+        'cliente_id': cliente_id,
+        'status_projeto_id': 1  # Exemplo de status do projeto
+    }
+    projeto_response = client.post('/projetos', json=projeto_data)
+    projeto_id = projeto_response.get_json()['id']
+
+    # Dados para criar uma nova atividade
+    atividade_data = {
+        'descricao': 'Análise de Requisitos',
+        'projeto_id': projeto_id
+    }
+
+    # Requisição POST para criar a atividade
+    response = client.post('/atividades', json=atividade_data)
+    atividade_id = response.get_json()['id']
+
+    response = client.get(f'/atividades/{atividade_id}')
+    assert response.status_code == 200
+
 
 # Teste para a rota GET /atividades (Listar atividades)
 def test_get_atividades(setup):
@@ -390,7 +424,8 @@ def test_update_atividade(setup):
 
     # Dados para atualizar a atividade
     updated_data = {
-        'descricao': 'Desenvolvimento da API RESTful'
+        'descricao': 'Desenvolvimento da API RESTful',
+        'projeto_id': projeto_id
     }
 
     # Requisição PUT para atualizar a atividade
@@ -402,6 +437,17 @@ def test_update_atividade(setup):
     # Verificar se a atividade foi atualizada corretamente
     json_data = response.get_json()
     assert json_data['descricao'] == 'Desenvolvimento da API RESTful'
+
+
+def test_update_atividade_404(setup):
+    client = setup
+    updated_data = {
+        'descricao': 'Desenvolvimento da API RESTful',
+        'projeto_id': 1
+    }
+    response = client.put(f'/atividades/{2222222}', json=updated_data)
+
+    assert response.status_code == 404
 
 
 # Teste para a rota DELETE /atividades/{id} (Deletar atividade)
@@ -443,3 +489,11 @@ def test_delete_atividade(setup):
     # Verificar se a atividade foi realmente deletada
     response = client.get(f'/atividades/{atividade_id}')
     assert response.status_code == 404  # A atividade não deve existir mais
+
+def test_delete_atividade_404(setup):
+    client = setup
+    # Requisição DELETE para deletar a atividade
+    response = client.delete(f'/atividades/{123123123}')
+
+    # Verificar se o status é 200 OK
+    assert response.status_code == 404
