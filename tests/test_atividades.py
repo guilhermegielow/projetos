@@ -215,3 +215,9 @@ def test_delete_atividade_404(setup):
     response = client.delete(f'/atividades/{123123123}')
 
     assert response.status_code == 404
+
+
+def test_get_atividade_404(setup):
+    client = setup
+    response = client.get(f'/atividades')
+    assert response.status_code == 404

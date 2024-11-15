@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Clientes from '../components/ClientesCrud.vue';  // Verifique se o caminho está correto
+import Clientes from '../components/ClientesCrud.vue';
 import Projetos from '../components/ProjetosCrud.vue';
 import Atividades from '../components/AtividadesCrud.vue';
+import ProjetosAbertos from '../components/ProjetosAbertosCrud.vue';
 
 const routes = [
   {
@@ -18,6 +19,11 @@ const routes = [
     path: '/atividades',
     name: 'Atividades',
     component: Atividades
+  },
+  {
+    path: '/projetosabertos',
+    name: 'ProjetosAbertos',
+    component: ProjetosAbertos
   },
   {
     path: '/',

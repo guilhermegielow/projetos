@@ -85,6 +85,12 @@ def test_get_client_id_404(setup):
     assert response.status_code == 404
 
 
+def test_get_client_404(setup):
+    client = setup
+    response = client.get(f'/clientes')
+    assert response.status_code == 404
+
+
 def test_update_cliente(setup):
     client = setup
     cliente_data = {

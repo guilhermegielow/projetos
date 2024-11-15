@@ -49,6 +49,10 @@ def test_create_projeto(setup):
 
 def test_get_projetos(setup):
     client = setup
+    status_projeto = StatusProjeto(id=2, nome='Em Progresso')
+    db.session.add(status_projeto)
+    db.session.commit()
+
     cliente_data = {
         'nome': 'Ana Costa',
         'email': 'ana.costa@email.com',
@@ -191,4 +195,10 @@ def test_delete_projeto(setup):
 def test_delete_projetos_404(setup):
     client = setup
     response = client.delete(f'/projetos/{123123123}')
+    assert response.status_code == 404
+
+
+def test_get_projeto_404(setup):
+    client = setup
+    response = client.get(f'/projetos')
     assert response.status_code == 404

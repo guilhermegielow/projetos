@@ -26,9 +26,16 @@ def create_atividade():
 @atividades.route('/atividades', methods=['GET'])
 def get_atividades():
     atividades_list = Atividade.query.all()
+
+    if not atividades_list:
+        abort(404, description="Atividades não encontradas")
+
     return jsonify([{
         "id": atividade.id,
         "projeto_id": atividade.projeto_id,
+        "cliente_id": atividade.projeto.cliente_id,
+        "projeto_nome": atividade.projeto.nome,
+        "cliente_nome": atividade.projeto.cliente.nome,
         "descricao": atividade.descricao,
         "data": atividade.data
     } for atividade in atividades_list])
@@ -39,7 +46,7 @@ def get_atividade(atividade_id):
     atividade = db.session.get(Atividade, atividade_id)
 
     if not atividade:
-        abort(404, description="Atividade não encontrado")
+        abort(404, description="Atividade não encontrada")
 
     return jsonify({
         "id": atividade.id,

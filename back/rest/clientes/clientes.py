@@ -23,6 +23,8 @@ def create_cliente():
 @clientes.route('/clientes', methods=['GET'])
 def get_clientes():
     clientes_list = Cliente.query.all()
+    if not clientes_list:
+        abort(404, description="Clientes não encontrados")
     return jsonify([{"id": cliente.id, "nome": cliente.nome, "email": cliente.email, "telefone": cliente.telefone,
                      "cnpj": cliente.cnpj}
                     for cliente in clientes_list])

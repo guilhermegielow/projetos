@@ -1,7 +1,7 @@
 import os
 import sys
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, abort
 
 from models import Projeto
 from models.models import db
@@ -27,8 +27,11 @@ def create_projeto():
 @projetos.route('/projetos', methods=['GET'])
 def get_projetos():
     projetos_list = Projeto.query.all()
+    if not projetos_list:
+        abort(404, description="Projetos não encontrados")
     return jsonify([{"id": projeto.id, "nome": projeto.nome, "descricao": projeto.descricao,
-                     "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id}
+                     "cliente_id": projeto.cliente_id, 'cliente_nome': projeto.cliente.nome,
+                     "status_projeto_id": projeto.status_projeto_id, 'status_projeto_nome': projeto.status_projeto.nome}
                     for projeto in projetos_list])
 
 
@@ -39,9 +42,11 @@ def get_projetos_abertos():
 
     projetos_list = []
     for projeto in projetos_base_list:
+
         projeto_info = {
             'id': projeto.id,
             'nome': projeto.nome,
+            'descricao': projeto.descricao,
             'cliente': projeto.cliente.nome,
             'status': projeto.status_projeto.nome,
             'atividades': [{'id': atividade.id, 'descricao': atividade.descricao} for atividade in projeto.atividades]

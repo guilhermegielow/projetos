@@ -3,6 +3,7 @@ import sys
 
 from flask import Flask
 
+from rest.status_projetos.status_projetos import status_projetos
 from rest.clientes.clientes import clientes
 from rest.projetos.projetos import projetos
 from rest.atividades.atividades import atividades
@@ -25,6 +26,7 @@ def create_app(config_class=Config):
     app.register_blueprint(clientes)
     app.register_blueprint(projetos)
     app.register_blueprint(atividades)
+    app.register_blueprint(status_projetos)
     return app
 
 
