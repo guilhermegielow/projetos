@@ -23,15 +23,15 @@ def create_projeto():
 
 @projetos.route('/projetos', methods=['GET'])
 def get_projetos():
-    projetos = Projeto.query.all()
+    projetos_list = Projeto.query.all()
     return jsonify([{"id": projeto.id, "nome": projeto.nome, "descricao": projeto.descricao,
                      "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id}
-                    for projeto in projetos])
+                    for projeto in projetos_list])
 
 
 @projetos.route('/projetos/<int:projeto_id>', methods=['PUT'])
 def update_projeto(projeto_id):
-    projeto = Projeto.query.get(projeto_id)
+    projeto = db.session.get(Projeto, projeto_id)
     if projeto:
         data = request.get_json()
         projeto.nome = data['nome']
@@ -46,7 +46,7 @@ def update_projeto(projeto_id):
 
 @projetos.route('/projetos/<int:projeto_id>', methods=['DELETE'])
 def delete_projeto(projeto_id):
-    projeto = Projeto.query.get(projeto_id)
+    projeto = db.session.get(Projeto, projeto_id)
     if projeto:
         db.session.delete(projeto)
         db.session.commit()

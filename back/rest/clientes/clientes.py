@@ -22,15 +22,15 @@ def create_cliente():
 
 @clientes.route('/clientes', methods=['GET'])
 def get_clientes():
-    clientes = Cliente.query.all()
+    clientes_list = Cliente.query.all()
     return jsonify([{"id": cliente.id, "nome": cliente.nome, "email": cliente.email, "telefone": cliente.telefone,
                      "cnpj": cliente.cnpj}
-                    for cliente in clientes])
+                    for cliente in clientes_list])
 
 
 @clientes.route('/clientes/<int:cliente_id>', methods=['GET'])
 def get_cliente(cliente_id):
-    cliente = Cliente.query.get(cliente_id)
+    cliente = db.session.get(Cliente, cliente_id)
 
     if not cliente:
         abort(404, description="Cliente não encontrado")
@@ -46,7 +46,7 @@ def get_cliente(cliente_id):
 
 @clientes.route('/clientes/<int:cliente_id>', methods=['PUT'])
 def update_cliente(cliente_id):
-    cliente = Cliente.query.get(cliente_id)
+    cliente = db.session.get(Cliente, cliente_id)
     if cliente:
         data = request.get_json()
         cliente.nome = data['nome']
@@ -62,7 +62,7 @@ def update_cliente(cliente_id):
 
 @clientes.route('/clientes/<int:cliente_id>', methods=['DELETE'])
 def delete_cliente(cliente_id):
-    cliente = Cliente.query.get(cliente_id)
+    cliente = db.session.get(Cliente, cliente_id)
     if cliente:
         db.session.delete(cliente)
         db.session.commit()

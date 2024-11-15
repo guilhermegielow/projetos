@@ -25,18 +25,18 @@ def create_atividade():
 
 @atividades.route('/atividades', methods=['GET'])
 def get_atividades():
-    atividades = Atividade.query.all()
+    atividades_list = Atividade.query.all()
     return jsonify([{
         "id": atividade.id,
         "projeto_id": atividade.projeto_id,
         "descricao": atividade.descricao,
         "data": atividade.data
-    } for atividade in atividades])
+    } for atividade in atividades_list])
 
 
 @atividades.route('/atividades/<int:atividade_id>', methods=['GET'])
 def get_atividade(atividade_id):
-    atividade = Atividade.query.get(atividade_id)
+    atividade = db.session.get(Atividade, atividade_id)
 
     if not atividade:
         abort(404, description="Atividade não encontrado")
@@ -51,7 +51,7 @@ def get_atividade(atividade_id):
 
 @atividades.route('/atividades/<int:atividade_id>', methods=['PUT'])
 def update_atividade(atividade_id):
-    atividade = Atividade.query.get(atividade_id)
+    atividade = db.session.get(Atividade, atividade_id)
     if atividade:
         data = request.get_json()
         atividade.descricao = data['descricao']
@@ -63,7 +63,7 @@ def update_atividade(atividade_id):
 
 @atividades.route('/atividades/<int:atividade_id>', methods=['DELETE'])
 def delete_atividade(atividade_id):
-    atividade = Atividade.query.get(atividade_id)
+    atividade = db.session.get(Atividade, atividade_id)
     if atividade:
         db.session.delete(atividade)
         db.session.commit()
