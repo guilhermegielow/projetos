@@ -1,5 +1,8 @@
 <template>
-  <div class="container">
+  <div>
+    <Header />
+    <div class="content">
+    <div class="container mt-6">
     <button class="btn btn-primary" @click="showAddModal">Adicionar Atividade</button>
 
     <table class="table table-striped table-hover mt-3">
@@ -29,9 +32,6 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" @click="closeModal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
             <h4 class="modal-title">{{ isEditing ? 'Editar Atividade' : 'Adicionar Atividade' }}</h4>
           </div>
           <form @submit.prevent="isEditing ? updateAtividade() : createAtividade()">
@@ -86,12 +86,18 @@
       </div>
     </div>
   </div>
+  </div>
+    </div>
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
+import Header from "./HeaderPage.vue";
 
 export default {
+  components: {
+  Header,
+},
   data() {
     return {
       atividades: [], // Lista de atividades
@@ -206,14 +212,7 @@ export default {
 
 <style scoped>
 .container {
-  margin-top: 20px;
-}
-
-.mt-3 {
-  margin-top: 15px;
-}
-
-.modal.show {
-  background: rgba(0, 0, 0, 0.5);
+  margin-top: 60px;
+  max-width: 800px;
 }
 </style>

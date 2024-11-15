@@ -1,5 +1,8 @@
 <template>
-    <div class="container mt-4">
+  <div>
+    <Header />
+    <div class="content">
+    <div class="container mt-6">
       <b-button @click="showAddModal" variant="primary">Adicionar Cliente</b-button>
       
       <b-table :items="clientes" :fields="fields" hover responsive striped>
@@ -49,12 +52,18 @@
         </b-form>
       </b-modal>
     </div>
-  </template>
+  </div>
+    </div>
+</template>
   
   <script>
   import axios from 'axios';
+  import Header from "./HeaderPage.vue";
   
   export default {
+    components: {
+    Header,
+  },
     data() {
       return {
         clientes: [], // Lista de clientes
@@ -139,6 +148,7 @@
   
   <style scoped>
   .container {
+    margin-top: 60px;
     max-width: 800px;
   }
   </style>
