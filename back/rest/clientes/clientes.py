@@ -12,61 +12,76 @@ clientes = Blueprint('clientes', __name__)
 
 @clientes.route('/clientes', methods=['POST'])
 def create_cliente():
-    data = request.get_json()
-    new_cliente = Cliente(nome=data['nome'], email=data['email'], telefone=data['telefone'], cnpj=data['cnpj'])
-    db.session.add(new_cliente)
-    db.session.commit()
-    return jsonify({"id": new_cliente.id, "nome": new_cliente.nome, "email": new_cliente.email,
-                    "telefone": new_cliente.telefone, "cnpj": new_cliente.cnpj}), 201
+    try:
+        data = request.get_json()
+        new_cliente = Cliente(nome=data['nome'], email=data['email'], telefone=data['telefone'], cnpj=data['cnpj'])
+        db.session.add(new_cliente)
+        db.session.commit()
+        return jsonify({"id": new_cliente.id, "nome": new_cliente.nome, "email": new_cliente.email,
+                        "telefone": new_cliente.telefone, "cnpj": new_cliente.cnpj}), 201
+    except Exception as e:
+        abort(400, description=str(e))
 
 
 @clientes.route('/clientes', methods=['GET'])
 def get_clientes():
-    clientes_list = Cliente.query.all()
-    if not clientes_list:
-        abort(404, description="Clientes não encontrados")
-    return jsonify([{"id": cliente.id, "nome": cliente.nome, "email": cliente.email, "telefone": cliente.telefone,
-                     "cnpj": cliente.cnpj}
-                    for cliente in clientes_list])
+    try:
+        clientes_list = Cliente.query.all()
+        if not clientes_list:
+            abort(404, description="Clientes não encontrados")
+        return jsonify([{"id": cliente.id, "nome": cliente.nome, "email": cliente.email, "telefone": cliente.telefone,
+                         "cnpj": cliente.cnpj}
+                        for cliente in clientes_list])
+    except Exception as e:
+        abort(400, description=str(e))
 
 
 @clientes.route('/clientes/<int:cliente_id>', methods=['GET'])
 def get_cliente(cliente_id):
-    cliente = db.session.get(Cliente, cliente_id)
+    try:
+        cliente = db.session.get(Cliente, cliente_id)
 
-    if not cliente:
-        abort(404, description="Cliente não encontrado")
+        if not cliente:
+            abort(404, description="Cliente não encontrado")
 
-    return jsonify({
-        "id": cliente.id,
-        "nome": cliente.nome,
-        "email": cliente.email,
-        "telefone": cliente.telefone,
-        "cnpj": cliente.cnpj
-    })
+        return jsonify({
+            "id": cliente.id,
+            "nome": cliente.nome,
+            "email": cliente.email,
+            "telefone": cliente.telefone,
+            "cnpj": cliente.cnpj
+        })
+    except Exception as e:
+        abort(400, description=str(e))
 
 
 @clientes.route('/clientes/<int:cliente_id>', methods=['PUT'])
 def update_cliente(cliente_id):
-    cliente = db.session.get(Cliente, cliente_id)
-    if cliente:
-        data = request.get_json()
-        cliente.nome = data['nome']
-        cliente.telefone = data['telefone']
-        cliente.email = data['email']
-        cliente.cnpj = data['cnpj']
-        db.session.commit()
-        return jsonify(
-            {"id": cliente.id, "nome": cliente.nome, "email": cliente.email, "telefone": cliente.telefone,
-             "cnpj": cliente.cnpj})
-    return jsonify({"message": "Cliente não encontrado"}), 404
+    try:
+        cliente = db.session.get(Cliente, cliente_id)
+        if cliente:
+            data = request.get_json()
+            cliente.nome = data['nome']
+            cliente.telefone = data['telefone']
+            cliente.email = data['email']
+            cliente.cnpj = data['cnpj']
+            db.session.commit()
+            return jsonify(
+                {"id": cliente.id, "nome": cliente.nome, "email": cliente.email, "telefone": cliente.telefone,
+                 "cnpj": cliente.cnpj})
+        return jsonify({"message": "Cliente não encontrado"}), 404
+    except Exception as e:
+        abort(400, description=str(e))
 
 
 @clientes.route('/clientes/<int:cliente_id>', methods=['DELETE'])
 def delete_cliente(cliente_id):
-    cliente = db.session.get(Cliente, cliente_id)
-    if cliente:
-        db.session.delete(cliente)
-        db.session.commit()
-        return jsonify({"message": "Cliente excluído com sucesso"})
-    return jsonify({"message": "Cliente não encontrado"}), 404
+    try:
+        cliente = db.session.get(Cliente, cliente_id)
+        if cliente:
+            db.session.delete(cliente)
+            db.session.commit()
+            return jsonify({"message": "Cliente excluído com sucesso"})
+        return jsonify({"message": "Cliente não encontrado"}), 404
+    except Exception as e:
+        abort(400, description=str(e))
