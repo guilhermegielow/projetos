@@ -3,17 +3,14 @@ from models import db, Cliente, Projeto, Atividade
 from config import Config
 from flask_cors import CORS
 
+
 def create_app(config_class=Config):
-    # Cria a instância do app Flask
     app = Flask(__name__)
 
-    # Habilita CORS (Cross-Origin Resource Sharing)
     CORS(app)
 
-    # Carrega a configuração a partir da classe fornecida (por padrão é Config)
     app.config.from_object(config_class)
 
-    # Inicializa o banco de dados com a configuração do app
     db.init_app(app)
 
     @app.route('/clientes', methods=['POST'])
@@ -34,14 +31,11 @@ def create_app(config_class=Config):
 
     @app.route('/clientes/<int:id>', methods=['GET'])
     def get_cliente(id):
-        # Consulta o cliente pelo id
         cliente = Cliente.query.get(id)
 
-        # Verifica se o cliente existe
         if not cliente:
             abort(404, description="Cliente não encontrado")
 
-        # Retorna os dados do cliente em formato JSON
         return jsonify({
             "id": cliente.id,
             "nome": cliente.nome,
@@ -88,7 +82,7 @@ def create_app(config_class=Config):
     def get_projetos():
         projetos = Projeto.query.all()
         return jsonify([{"id": projeto.id, "nome": projeto.nome, "descricao": projeto.descricao,
-                        "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id}
+                         "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id}
                         for projeto in projetos])
 
     @app.route('/projetos/<int:id>', methods=['PUT'])
@@ -102,7 +96,7 @@ def create_app(config_class=Config):
             projeto.status_projeto_id = data['status_projeto_id']
             db.session.commit()
             return jsonify({"id": projeto.id, "nome": projeto.nome, "descricao": projeto.descricao,
-                        "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id})
+                            "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id})
         return jsonify({"message": "Projeto não encontrado"}), 404
 
     @app.route('/projetos/<int:id>', methods=['DELETE'])
@@ -124,7 +118,7 @@ def create_app(config_class=Config):
         db.session.add(new_atividade)
         db.session.commit()
         return jsonify({"id": new_atividade.id, "projeto_id": new_atividade.projeto_id,
-                        "descricao": new_atividade.descricao, "data": new_atividade.data }), 201
+                        "descricao": new_atividade.descricao, "data": new_atividade.data}), 201
 
     @app.route('/atividades', methods=['GET'])
     def get_atividades():
@@ -138,14 +132,11 @@ def create_app(config_class=Config):
 
     @app.route('/atividades/<int:id>', methods=['GET'])
     def get_atividade(id):
-        # Consulta o cliente pelo id
         atividade = Atividade.query.get(id)
 
-        # Verifica se o cliente existe
         if not atividade:
             abort(404, description="Atividade não encontrado")
 
-        # Retorna os dados do cliente em formato JSON
         return jsonify({
             "id": atividade.id,
             "descricao": atividade.descricao,
@@ -173,9 +164,9 @@ def create_app(config_class=Config):
             return jsonify({"message": "Atividade excluída com sucesso"})
         return jsonify({"message": "Atividade não encontrada"}), 404
 
-    # Retorna o app configurado
     return app
 
+
 if __name__ == '__main__':
-    app = create_app()  # Cria o app com a configuração padrão (Config)
-    app.run(debug=True)  # Roda o servidor Flask com o modo de debug ativado)
+    app = create_app()
+    app.run(debug=True)

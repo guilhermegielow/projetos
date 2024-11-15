@@ -4,4 +4,4 @@ class Config:
 
 
 class TestConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'  # Banco de dados SQLite para testes
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'

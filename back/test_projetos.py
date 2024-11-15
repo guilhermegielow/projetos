@@ -6,15 +6,13 @@ from config import TestConfig
 
 @pytest.fixture
 def setup():
-    # Cria uma instância do app para testes com a configuração de teste
     app = create_app(config_class=TestConfig)
 
-    # Cria o contexto da aplicação e o banco de dados em memória
     with app.app_context():
-        db.create_all()  # Cria as tabelas
-        yield app.test_client()  # Retorna o cliente de teste
+        db.create_all()
+        yield app.test_client()
 
-        db.drop_all()  # Limpa o banco de dados após o teste
+        db.drop_all()
 
 
 def test_create_cliente(setup):
@@ -26,19 +24,15 @@ def test_create_cliente(setup):
         'cnpj': '98765432000101'
     }
 
-    # Fazendo a requisição POST para criar um cliente
     response = client.post('/clientes', json=cliente_data)
 
-    # Verificando se a resposta foi 201 (Created)
     assert response.status_code == 201
 
-    # Verificando se o cliente foi criado corretamente
     json_data = response.get_json()
     assert json_data['nome'] == cliente_data['nome']
     assert json_data['email'] == cliente_data['email']
     assert json_data['telefone'] == cliente_data['telefone']
     assert json_data['cnpj'] == cliente_data['cnpj']
-
 
 
 def test_get_clientes(setup):
@@ -51,13 +45,10 @@ def test_get_clientes(setup):
     }
     client.post('/clientes', json=cliente_data)
 
-    # Requisição GET para listar os clientes
     response = client.get('/clientes')
 
-    # Verificar se o status é 200 OK
     assert response.status_code == 200
 
-    # Verificar se o cliente criado está na resposta
     json_data = response.get_json()
     assert len(json_data) > 0
     assert json_data[0]['nome'] == 'Maria Souza'
@@ -67,6 +58,7 @@ def test_get_clientes(setup):
 
     response = client.get(f'/clientes/{cliente_id}')
     assert response.status_code == 200
+
 
 def test_get_client_id(setup):
     client = setup
@@ -83,10 +75,12 @@ def test_get_client_id(setup):
     response = client.get(f'/clientes/{cliente_id}')
     assert response.status_code == 200
 
+
 def test_get_client_id_404(setup):
     client = setup
     response = client.get(f'/clientes/{231123}')
     assert response.status_code == 404
+
 
 def test_update_cliente(setup):
     client = setup
@@ -115,6 +109,7 @@ def test_update_cliente(setup):
     assert json_data['nome'] == 'Carlos Pereira Silva'
     assert json_data['email'] == 'carlos.silva@email.com'
 
+
 def test_update_cliente_404(setup):
     client = setup
     updated_data = {
@@ -126,6 +121,7 @@ def test_update_cliente_404(setup):
     response = client.put(f'/clientes/{2222222}', json=updated_data)
 
     assert response.status_code == 404
+
 
 def test_delete_cliente(setup):
     client = setup
@@ -142,12 +138,13 @@ def test_delete_cliente(setup):
 
     assert response.status_code == 200
 
+
 def test_delete_cliente_404(setup):
     client = setup
     response = client.delete(f'/clientes/{123123123}')
     assert response.status_code == 404
 
-# Teste da criação de um projeto
+
 def test_create_projeto(setup):
     client = setup
 
@@ -163,7 +160,7 @@ def test_create_projeto(setup):
     projeto_data = {
         'nome': 'Projeto A',
         'descricao': 'Descrição do Projeto A',
-        'status_projeto_id': 1,  # Assumindo que o status 1 já existe
+        'status_projeto_id': 1,
         'cliente_id': cliente_id
     }
 
@@ -174,7 +171,6 @@ def test_create_projeto(setup):
     assert json_data['descricao'] == 'Descrição do Projeto A'
 
 
-# Teste de listagem de projetos
 def test_get_projetos(setup):
     client = setup
     cliente_data = {
@@ -189,14 +185,15 @@ def test_get_projetos(setup):
     client.post('/projetos', json={
         'nome': 'Projeto B',
         'descricao': 'Descrição do Projeto B',
-        'status_projeto_id': 2,  # Assumindo que o status 2 já existe
+        'status_projeto_id': 2,
         'cliente_id': cliente_id
     })
 
     response = client.get('/projetos')
     assert response.status_code == 200
     json_data = response.get_json()
-    assert len(json_data) > 0  # Verifica se há pelo menos um projeto na lista
+    assert len(json_data) > 0
+
 
 def test_update_projeto(setup):
     client = setup
@@ -235,6 +232,7 @@ def test_update_projeto(setup):
     assert json_data['descricao'] == 'teste'
     assert json_data['status_projeto_id'] == 2
 
+
 def test_update_projeto_404(setup):
     client = setup
     updated_data = {
@@ -246,6 +244,7 @@ def test_update_projeto_404(setup):
     response = client.put(f'/projetos/{2222222}', json=updated_data)
 
     assert response.status_code == 404
+
 
 def test_delete_projeto(setup):
     client = setup
@@ -271,13 +270,13 @@ def test_delete_projeto(setup):
 
     assert response.status_code == 200
 
+
 def test_delete_projetos_404(setup):
     client = setup
     response = client.delete(f'/projetos/{123123123}')
     assert response.status_code == 404
 
 
-# Teste para a rota POST /atividades (Criar atividade)
 def test_create_atividade(setup):
     client = setup
     cliente_data = {
@@ -289,33 +288,29 @@ def test_create_atividade(setup):
     cliente_response = client.post('/clientes', json=cliente_data)
     cliente_id = cliente_response.get_json()['id']
 
-    # Criar um projeto antes de criar a atividade
     projeto_data = {
         'nome': 'Projeto X',
         'descricao': 'Projeto de Desenvolvimento de Software',
         'cliente_id': cliente_id,
-        'status_projeto_id': 1  # Exemplo de status do projeto
+        'status_projeto_id': 1
     }
     projeto_response = client.post('/projetos', json=projeto_data)
     projeto_id = projeto_response.get_json()['id']
 
-    # Dados para criar uma nova atividade
     atividade_data = {
         'descricao': 'Análise de Requisitos',
         'projeto_id': projeto_id
     }
 
-    # Requisição POST para criar a atividade
     response = client.post('/atividades', json=atividade_data)
 
-    # Verificar se o status é 201 (Criado)
     assert response.status_code == 201
 
-    # Verificar se a atividade foi criada corretamente
     json_data = response.get_json()
     assert json_data['descricao'] == 'Análise de Requisitos'
     assert json_data['projeto_id'] == projeto_id
-    assert 'data' in json_data  # Verificar se a data foi gerada automaticamente
+    assert 'data' in json_data
+
 
 def test_get_atividade_id(setup):
     client = setup
@@ -333,7 +328,7 @@ def test_get_atividade_id(setup):
         'nome': 'Projeto X',
         'descricao': 'Projeto de Desenvolvimento de Software',
         'cliente_id': cliente_id,
-        'status_projeto_id': 1  # Exemplo de status do projeto
+        'status_projeto_id': 1
     }
     projeto_response = client.post('/projetos', json=projeto_data)
     projeto_id = projeto_response.get_json()['id']
@@ -344,7 +339,6 @@ def test_get_atividade_id(setup):
         'projeto_id': projeto_id
     }
 
-    # Requisição POST para criar a atividade
     response = client.post('/atividades', json=atividade_data)
     atividade_id = response.get_json()['id']
 
@@ -352,7 +346,6 @@ def test_get_atividade_id(setup):
     assert response.status_code == 200
 
 
-# Teste para a rota GET /atividades (Listar atividades)
 def test_get_atividades(setup):
     client = setup
     cliente_data = {
@@ -368,31 +361,26 @@ def test_get_atividades(setup):
         'nome': 'Projeto Y',
         'descricao': 'Desenvolvimento de Frontend',
         'cliente_id': cliente_id,
-        'status_projeto_id': 1  # Exemplo de status do projeto
+        'status_projeto_id': 1
     }
     projeto_response = client.post('/projetos', json=projeto_data)
     projeto_id = projeto_response.get_json()['id']
 
-    # Criar uma atividade
     atividade_data = {
         'descricao': 'Desenvolvimento da Interface',
         'projeto_id': projeto_id
     }
     client.post('/atividades', json=atividade_data)
 
-    # Requisição GET para listar as atividades
     response = client.get('/atividades')
 
-    # Verificar se o status é 200 OK
     assert response.status_code == 200
 
-    # Verificar se a atividade está na resposta
     json_data = response.get_json()
     assert len(json_data) > 0
     assert json_data[0]['descricao'] == 'Desenvolvimento da Interface'
 
 
-# Teste para a rota PUT /atividades/{id} (Atualizar atividade)
 def test_update_atividade(setup):
     client = setup
     cliente_data = {
@@ -404,17 +392,15 @@ def test_update_atividade(setup):
     cliente_response = client.post('/clientes', json=cliente_data)
     cliente_id = cliente_response.get_json()['id']
 
-    # Criar um projeto antes de criar a atividade
     projeto_data = {
         'nome': 'Projeto Z',
         'descricao': 'Desenvolvimento de API',
         'cliente_id': cliente_id,
-        'status_projeto_id': 2  # Exemplo de status do projeto
+        'status_projeto_id': 2
     }
     projeto_response = client.post('/projetos', json=projeto_data)
     projeto_id = projeto_response.get_json()['id']
 
-    # Criar uma atividade
     atividade_data = {
         'descricao': 'Desenvolvimento da API REST',
         'projeto_id': projeto_id
@@ -422,19 +408,15 @@ def test_update_atividade(setup):
     atividade_response = client.post('/atividades', json=atividade_data)
     atividade_id = atividade_response.get_json()['id']
 
-    # Dados para atualizar a atividade
     updated_data = {
         'descricao': 'Desenvolvimento da API RESTful',
         'projeto_id': projeto_id
     }
 
-    # Requisição PUT para atualizar a atividade
     response = client.put(f'/atividades/{atividade_id}', json=updated_data)
 
-    # Verificar se o status é 200 OK
     assert response.status_code == 200
 
-    # Verificar se a atividade foi atualizada corretamente
     json_data = response.get_json()
     assert json_data['descricao'] == 'Desenvolvimento da API RESTful'
 
@@ -450,7 +432,6 @@ def test_update_atividade_404(setup):
     assert response.status_code == 404
 
 
-# Teste para a rota DELETE /atividades/{id} (Deletar atividade)
 def test_delete_atividade(setup):
     client = setup
     cliente_data = {
@@ -462,17 +443,15 @@ def test_delete_atividade(setup):
     cliente_response = client.post('/clientes', json=cliente_data)
     cliente_id = cliente_response.get_json()['id']
 
-    # Criar um projeto antes de criar a atividade
     projeto_data = {
         'nome': 'Projeto W',
         'descricao': 'Desenvolvimento de Banco de Dados',
         'cliente_id': cliente_id,
-        'status_projeto_id': 3  # Exemplo de status do projeto
+        'status_projeto_id': 3
     }
     projeto_response = client.post('/projetos', json=projeto_data)
     projeto_id = projeto_response.get_json()['id']
 
-    # Criar uma atividade
     atividade_data = {
         'descricao': 'Modelagem do Banco de Dados',
         'projeto_id': projeto_id
@@ -480,20 +459,17 @@ def test_delete_atividade(setup):
     atividade_response = client.post('/atividades', json=atividade_data)
     atividade_id = atividade_response.get_json()['id']
 
-    # Requisição DELETE para deletar a atividade
     response = client.delete(f'/atividades/{atividade_id}')
 
-    # Verificar se o status é 200 OK
     assert response.status_code == 200
 
-    # Verificar se a atividade foi realmente deletada
     response = client.get(f'/atividades/{atividade_id}')
-    assert response.status_code == 404  # A atividade não deve existir mais
+    assert response.status_code == 404
+
 
 def test_delete_atividade_404(setup):
     client = setup
-    # Requisição DELETE para deletar a atividade
+
     response = client.delete(f'/atividades/{123123123}')
 
-    # Verificar se o status é 200 OK
     assert response.status_code == 404
