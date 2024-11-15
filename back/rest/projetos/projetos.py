@@ -7,6 +7,9 @@ from models import Projeto
 from models.models import db
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
+CONCLUIDO = 4
+CANCELADO = 5
+
 projetos = Blueprint('projetos', __name__)
 
 
@@ -27,6 +30,25 @@ def get_projetos():
     return jsonify([{"id": projeto.id, "nome": projeto.nome, "descricao": projeto.descricao,
                      "cliente_id": projeto.cliente_id, "status_projeto_id": projeto.status_projeto_id}
                     for projeto in projetos_list])
+
+
+@projetos.route('/projetos/abertos', methods=['GET'])
+def get_projetos_abertos():
+    projetos_base_list = Projeto.query.filter(
+        Projeto.status_projeto_id != CONCLUIDO and Projeto.status_projeto_id != CANCELADO).all()
+
+    projetos_list = []
+    for projeto in projetos_base_list:
+        projeto_info = {
+            'id': projeto.id,
+            'nome': projeto.nome,
+            'cliente': projeto.cliente.nome,
+            'status': projeto.status_projeto.nome,
+            'atividades': [{'id': atividade.id, 'descricao': atividade.descricao} for atividade in projeto.atividades]
+        }
+        projetos_list.append(projeto_info)
+
+    return jsonify(projetos_list)
 
 
 @projetos.route('/projetos/<int:projeto_id>', methods=['PUT'])

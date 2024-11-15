@@ -52,10 +52,8 @@ Este projeto é uma aplicação CRUD simples utilizando **Vue.js** para o fronte
 4. Instale as dependências:
     
     ```bash
-    # Acesse o diretório do projeto Vue.js
     cd frontend
     
-    # Instale as dependências
     npm install
     ```
 5. Inicie o servidor VueJs:
@@ -63,3 +61,13 @@ Este projeto é uma aplicação CRUD simples utilizando **Vue.js** para o fronte
     ```bash
     npm run serve
     ```
+
+6. Executar os testes com cobertura de testes da pasta de projetos
+   ```bash
+   pytest --cov=back/rest --cov-report=html
+   ```
+
+7. Verificar a qualidade do código python da pasta de projetos
+   ```bash
+   flake8 .\back\
+   ```
